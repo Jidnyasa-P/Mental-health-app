@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Play, Pause, Volume2, CheckCircle, X } from 'lucide-react'
+import { Play, Pause, Volume2, CheckCircle, X, Volume1 } from 'lucide-react'
 
 interface MeditationPlayerProps {
   session: {
@@ -21,8 +21,13 @@ export function MeditationPlayer({ session, onClose }: MeditationPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [timeElapsed, setTimeElapsed] = useState(0)
   const [isComplete, setIsComplete] = useState(false)
+  const [voiceEnabled, setVoiceEnabled] = useState(true)
+  const [volume, setVolume] = useState(70)
+  const [isSpeaking, setIsSpeaking] = useState(false)
+  const synthesisRef = useRef<SpeechSynthesisUtterance | null>(null)
   const totalSeconds = session.duration_minutes * 60
 
+  // Handle session timer
   useEffect(() => {
     let interval: NodeJS.Timeout
     if (isPlaying && timeElapsed < totalSeconds) {
@@ -32,6 +37,7 @@ export function MeditationPlayer({ session, onClose }: MeditationPlayerProps) {
           if (next >= totalSeconds) {
             setIsPlaying(false)
             setIsComplete(true)
+            stopVoice()
           }
           return next
         })
@@ -39,6 +45,27 @@ export function MeditationPlayer({ session, onClose }: MeditationPlayerProps) {
     }
     return () => clearInterval(interval)
   }, [isPlaying, timeElapsed, totalSeconds])
+
+  // Text-to-speech function
+  const speakContent = () => {
+    if (!voiceEnabled || isSpeaking) return
+
+    const utterance = new SpeechSynthesisUtterance(session.content)
+    utterance.rate = 0.9 // Slightly slower for meditation
+    utterance.pitch = 1
+    utterance.volume = volume / 100
+    
+    utterance.onstart = () => setIsSpeaking(true)
+    utterance.onend = () => setIsSpeaking(false)
+    
+    synthesisRef.current = utterance
+    window.speechSynthesis.speak(utterance)
+  }
+
+  const stopVoice = () => {
+    window.speechSynthesis.cancel()
+    setIsSpeaking(false)
+  }
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -49,9 +76,9 @@ export function MeditationPlayer({ session, onClose }: MeditationPlayerProps) {
   const progressPercent = (timeElapsed / totalSeconds) * 100
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-primary/5 to-accent/5">
-        <div className="p-6 md:p-8">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-background border-2 border-border shadow-2xl rounded-2xl">
+        <div className="p-6 md:p-8 relative">
           {/* Close button */}
           <button
             onClick={onClose}
@@ -109,48 +136,104 @@ export function MeditationPlayer({ session, onClose }: MeditationPlayerProps) {
           )}
 
           {/* Controls */}
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <Button
-              size="lg"
-              variant={isPlaying ? 'default' : 'outline'}
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="flex-1 max-w-xs"
-            >
-              {isPlaying ? (
-                <>
-                  <Pause className="h-5 w-5 mr-2" />
-                  Pause
-                </>
-              ) : (
-                <>
-                  <Play className="h-5 w-5 mr-2" />
-                  {timeElapsed === 0 ? 'Start Session' : 'Resume'}
-                </>
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => {
-                setTimeElapsed(0)
-                setIsPlaying(false)
-                setIsComplete(false)
-              }}
-            >
-              Restart
-            </Button>
-          </div>
+          <div className="flex flex-col gap-6 mb-8">
+            <div className="flex items-center justify-center gap-4">
+              <Button
+                size="lg"
+                variant={isPlaying ? 'default' : 'outline'}
+                onClick={() => {
+                  setIsPlaying(!isPlaying)
+                  if (!isPlaying && voiceEnabled && timeElapsed === 0) {
+                    setTimeout(() => speakContent(), 500)
+                  }
+                }}
+                className="flex-1 max-w-xs"
+              >
+                {isPlaying ? (
+                  <>
+                    <Pause className="h-5 w-5 mr-2" />
+                    Pause
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-5 w-5 mr-2" />
+                    {timeElapsed === 0 ? 'Start Session' : 'Resume'}
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => {
+                  setTimeElapsed(0)
+                  setIsPlaying(false)
+                  setIsComplete(false)
+                  stopVoice()
+                }}
+              >
+                Restart
+              </Button>
+            </div>
 
-          {/* Volume Control */}
-          <div className="flex items-center gap-3 justify-center">
-            <Volume2 className="h-5 w-5 text-muted-foreground" />
-            <input
-              type="range"
-              min="0"
-              max="100"
-              defaultValue="70"
-              className="w-32 h-2 bg-secondary/20 rounded-full appearance-none cursor-pointer"
-            />
+            {/* Voice Controls */}
+            <div className="bg-secondary/10 rounded-lg p-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={voiceEnabled}
+                    onChange={(e) => {
+                      setVoiceEnabled(e.target.checked)
+                      if (!e.target.checked) {
+                        stopVoice()
+                      }
+                    }}
+                    className="w-4 h-4 rounded"
+                  />
+                  <span className="text-sm font-medium text-foreground">Voice Narration</span>
+                </label>
+                <span className="text-xs text-muted-foreground">{isSpeaking ? 'Speaking...' : 'Ready'}</span>
+              </div>
+
+              {voiceEnabled && (
+                <div className="flex items-center gap-3">
+                  <Volume1 className="h-4 w-4 text-muted-foreground" />
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={volume}
+                    onChange={(e) => setVolume(parseInt(e.target.value))}
+                    className="flex-1 h-2 bg-primary/30 rounded-full appearance-none cursor-pointer"
+                  />
+                  <Volume2 className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground w-8 text-right">{volume}%</span>
+                </div>
+              )}
+
+              {voiceEnabled && (
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={speakContent}
+                    disabled={isSpeaking}
+                    className="flex-1"
+                  >
+                    {isSpeaking ? 'Reading...' : 'Read Aloud'}
+                  </Button>
+                  {isSpeaking && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={stopVoice}
+                    >
+                      Stop
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Tips */}

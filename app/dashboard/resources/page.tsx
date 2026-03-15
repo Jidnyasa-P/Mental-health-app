@@ -2,8 +2,8 @@
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { BookOpen, ExternalLink, Phone, Heart } from 'lucide-react'
-import { useState } from 'react'
+import { BookOpen, ExternalLink, Heart, Volume2 } from 'lucide-react'
+import { useState, useRef } from 'react'
 
 const resources = [
   {
@@ -121,6 +121,8 @@ const categories = ['All', 'Organizations', 'Crisis Support', 'Meditation', 'Onl
 export default function EducationalResources() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [savedResources, setSavedResources] = useState<number[]>([])
+  const [speakingId, setSpeakingId] = useState<number | null>(null)
+  const synthesisRef = useRef<SpeechSynthesisUtterance | null>(null)
 
   const filteredResources = selectedCategory === 'All' 
     ? resources 
@@ -128,6 +130,26 @@ export default function EducationalResources() {
 
   const handleSave = (id: number) => {
     setSavedResources(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id])
+  }
+
+  const speakDescription = (id: number, title: string, description: string) => {
+    if (speakingId === id) {
+      window.speechSynthesis.cancel()
+      setSpeakingId(null)
+      return
+    }
+
+    const fullText = `${title}. ${description}`
+    const utterance = new SpeechSynthesisUtterance(fullText)
+    utterance.rate = 1
+    utterance.pitch = 1
+    utterance.volume = 1
+
+    utterance.onstart = () => setSpeakingId(id)
+    utterance.onend = () => setSpeakingId(null)
+
+    synthesisRef.current = utterance
+    window.speechSynthesis.speak(utterance)
   }
 
   return (
@@ -201,12 +223,24 @@ export default function EducationalResources() {
               <span className="text-muted-foreground">{resource.type}</span>
             </div>
 
-            <a href={resource.url} target="_blank" rel="noopener noreferrer">
-              <Button className="w-full">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Visit
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => speakDescription(resource.id, resource.title, resource.description)}
+                className={`flex-1 ${speakingId === resource.id ? 'bg-primary/20 text-primary' : ''}`}
+                title="Read aloud"
+              >
+                <Volume2 className="h-4 w-4 mr-2" />
+                {speakingId === resource.id ? 'Stop' : 'Read'}
               </Button>
-            </a>
+              <a href={resource.url} target="_blank" rel="noopener noreferrer" className="flex-1">
+                <Button className="w-full">
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Visit
+                </Button>
+              </a>
+            </div>
           </Card>
         ))}
       </div>
