@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Heart, Brain, Zap, Users, BookOpen, MessageCircle, Feather, Search, Settings, Bell, LogOut } from 'lucide-react'
+import { Heart, Brain, Zap, Users, BookOpen, MessageCircle, Feather, Search, Bell } from 'lucide-react'
+import { Footer } from '@/components/footer'
 
 const features = [
   {
@@ -136,44 +137,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-background/50">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="grid gap-8 md:grid-cols-4 mb-8">
-            <div>
-              <h3 className="font-semibold text-foreground">MindWell</h3>
-              <p className="mt-2 text-sm text-muted-foreground">Your mental health companion</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground text-sm mb-4">Product</h4>
-              <div className="space-y-2">
-                <Link href="#features" className="text-sm text-muted-foreground hover:text-foreground transition">Features</Link>
-                <Link href="/dashboard/mood" className="text-sm text-muted-foreground hover:text-foreground transition">Mood Tracker</Link>
-                <Link href="/dashboard/chat" className="text-sm text-muted-foreground hover:text-foreground transition">AI Support</Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground text-sm mb-4">Resources</h4>
-              <div className="space-y-2">
-                <Link href="/dashboard/resources" className="text-sm text-muted-foreground hover:text-foreground transition">Learn</Link>
-                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition">Privacy</Link>
-                <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition">Terms</Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground text-sm mb-4">Support</h4>
-              <div className="space-y-2">
-                <Link href="/dashboard/crisis" className="text-sm text-muted-foreground hover:text-foreground transition">Crisis Help</Link>
-                <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition">About</Link>
-                <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition">Contact</Link>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; 2024 MindWell. All rights reserved. Your privacy and safety are our priority.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

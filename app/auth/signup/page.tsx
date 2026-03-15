@@ -6,19 +6,56 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 export default function Signup() {
   const router = useRouter()
-  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [agree, setAgree] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const supabase = createClient()
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (name && email && password && agree) {
-      // For demo purposes, just redirect to dashboard
-      router.push('/dashboard')
+    setError(null)
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters')
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        },
+      })
+
+      if (signUpError) {
+        setError(signUpError.message)
+        return
+      }
+
+      if (data) {
+        router.push('/auth/signup-success')
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+      console.error(err)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -41,26 +78,15 @@ export default function Signup() {
 
           <form onSubmit={handleSignup} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Full Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Your name"
-                className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground"
-                required
-              />
-            </div>
-
-            <div>
               <label className="block text-sm font-medium text-foreground mb-2">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground"
+                className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground disabled:opacity-50"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -71,10 +97,31 @@ export default function Signup() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground"
+                className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground disabled:opacity-50"
                 required
+                disabled={isLoading}
+              />
+              <p className="text-xs text-muted-foreground mt-1">At least 6 characters</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">Confirm Password</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground disabled:opacity-50"
+                required
+                disabled={isLoading}
               />
             </div>
+
+            {error && (
+              <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30">
+                <p className="text-sm text-destructive">{error}</p>
+              </div>
+            )}
 
             <div className="flex items-start gap-2">
               <input
@@ -84,6 +131,7 @@ export default function Signup() {
                 onChange={(e) => setAgree(e.target.checked)}
                 className="h-5 w-5 rounded mt-0.5"
                 required
+                disabled={isLoading}
               />
               <label htmlFor="agree" className="text-sm text-muted-foreground">
                 I agree to the{' '}
@@ -93,7 +141,9 @@ export default function Signup() {
               </label>
             </div>
 
-            <Button type="submit" className="w-full" disabled={!agree}>Create Account</Button>
+            <Button type="submit" className="w-full" disabled={!agree || isLoading}>
+              {isLoading ? 'Creating Account...' : 'Create Account'}
+            </Button>
           </form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">

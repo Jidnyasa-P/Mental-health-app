@@ -2,19 +2,121 @@
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { BookOpen, ExternalLink, Play, FileText } from 'lucide-react'
+import { BookOpen, ExternalLink, Phone, Heart } from 'lucide-react'
 import { useState } from 'react'
 
 const resources = [
-  { id: 1, type: 'article', title: 'Understanding Anxiety Disorders', author: 'Dr. Smith', date: 'Jan 15, 2024', readTime: '8 min read', category: 'Mental Health' },
-  { id: 2, type: 'video', title: 'Cognitive Behavioral Therapy Basics', author: 'Sarah Chen', date: 'Jan 10, 2024', duration: '12 min', category: 'Therapy' },
-  { id: 3, type: 'article', title: 'Sleep Hygiene Tips for Better Rest', author: 'Dr. Johnson', date: 'Jan 5, 2024', readTime: '6 min read', category: 'Wellness' },
-  { id: 4, type: 'video', title: 'Building Resilience in Difficult Times', author: 'Dr. Martinez', date: 'Dec 28, 2023', duration: '15 min', category: 'Mental Health' },
-  { id: 5, type: 'article', title: 'Mindfulness for Beginners', author: 'Emma Wilson', date: 'Dec 20, 2023', readTime: '10 min read', category: 'Meditation' },
-  { id: 6, type: 'video', title: 'Managing Work Stress Effectively', author: 'Michael Lee', date: 'Dec 15, 2023', duration: '9 min', category: 'Wellness' },
+  {
+    id: 1,
+    type: 'organization',
+    title: 'NAMI - National Alliance on Mental Illness',
+    description: 'Comprehensive mental health information, support groups, and education',
+    url: 'https://www.nami.org',
+    category: 'Organizations',
+    icon: '🏥'
+  },
+  {
+    id: 2,
+    type: 'hotline',
+    title: 'Crisis Text Line',
+    description: 'Text HOME to 741741. Free, 24/7 crisis support from trained counselors',
+    url: 'https://www.crisistextline.org',
+    category: 'Crisis Support',
+    icon: '📱'
+  },
+  {
+    id: 3,
+    type: 'hotline',
+    title: 'SAMHSA National Helpline',
+    description: 'Free, confidential, 24/7 treatment referral: 1-800-662-4357',
+    url: 'https://www.samhsa.gov/find-help/national-helpline',
+    category: 'Crisis Support',
+    icon: '☎️'
+  },
+  {
+    id: 4,
+    type: 'platform',
+    title: 'Psychology Today - Therapist Finder',
+    description: 'Find licensed therapists near you with detailed profiles and specialties',
+    url: 'https://www.psychologytoday.com/us/basics/therapy',
+    category: 'Therapist Directory',
+    icon: '👥'
+  },
+  {
+    id: 5,
+    type: 'app',
+    title: 'Headspace - Meditation & Sleep',
+    description: 'Guided meditations, sleep stories, and mindfulness exercises',
+    url: 'https://www.headspace.com',
+    category: 'Meditation',
+    icon: '🧘'
+  },
+  {
+    id: 6,
+    type: 'app',
+    title: 'Calm - Sleep & Relaxation',
+    description: 'Sleep stories, breathing exercises, and relaxation programs',
+    url: 'https://www.calm.com',
+    category: 'Meditation',
+    icon: '🌙'
+  },
+  {
+    id: 7,
+    type: 'organization',
+    title: 'Anxiety and Depression Association of America',
+    description: 'Resources and support for anxiety and depression disorders',
+    url: 'https://adaa.org',
+    category: 'Organizations',
+    icon: '💪'
+  },
+  {
+    id: 8,
+    type: 'organization',
+    title: 'Mental Health America',
+    description: 'Mental health screening tools and educational resources',
+    url: 'https://www.mhanational.org',
+    category: 'Organizations',
+    icon: '🌟'
+  },
+  {
+    id: 9,
+    type: 'platform',
+    title: 'BetterHelp - Online Therapy',
+    description: 'Connect with licensed therapists online for affordable mental health support',
+    url: 'https://www.betterhelp.com',
+    category: 'Online Therapy',
+    icon: '💻'
+  },
+  {
+    id: 10,
+    type: 'app',
+    title: 'Insight Timer - Free Meditation',
+    description: 'Largest free meditation app with 100,000+ guided sessions',
+    url: 'https://insighttimer.com',
+    category: 'Meditation',
+    icon: '🔔'
+  },
+  {
+    id: 11,
+    type: 'article',
+    title: 'MindBodyGreen - Mental Health Articles',
+    description: 'Expert-written articles on mental health, wellness, and mindfulness',
+    url: 'https://www.mindbodygreen.com/basics/mental-health',
+    category: 'Education',
+    icon: '📖'
+  },
+  {
+    id: 12,
+    type: 'organization',
+    title: 'The Jed Foundation - Youth Mental Health',
+    description: 'Resources and support for adolescent mental health',
+    url: 'https://jedfoundation.org',
+    category: 'Youth Resources',
+    icon: '👨‍👩‍👧‍👦'
+  },
 ]
 
-const categories = ['All', 'Mental Health', 'Therapy', 'Wellness', 'Meditation']
+const categories = ['All', 'Organizations', 'Crisis Support', 'Meditation', 'Online Therapy', 'Therapist Directory', 'Education', 'Youth Resources']
 
 export default function EducationalResources() {
   const [selectedCategory, setSelectedCategory] = useState('All')
@@ -69,44 +171,42 @@ export default function EducationalResources() {
       </div>
 
       {/* Resources Grid */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredResources.map((resource) => (
-          <Card key={resource.id} className="p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-start justify-between mb-3">
+          <Card key={resource.id} className="p-6 hover:shadow-lg transition-shadow flex flex-col">
+            <div className="flex items-start justify-between mb-4">
               <div className="flex items-start gap-3 flex-1">
-                {resource.type === 'article' ? (
-                  <FileText className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                ) : (
-                  <Play className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                )}
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground">{resource.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">By {resource.author}</p>
+                <span className="text-3xl leading-none">{resource.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-foreground leading-tight">{resource.title}</h3>
                 </div>
               </div>
               <button
                 onClick={() => handleSave(resource.id)}
-                className={`p-2 rounded-lg transition ${
+                className={`p-2 rounded-lg transition flex-shrink-0 ${
                   savedResources.includes(resource.id)
-                    ? 'bg-primary/10 text-primary'
-                    : 'hover:bg-muted'
+                    ? 'bg-accent/10 text-accent'
+                    : 'hover:bg-muted text-muted-foreground'
                 }`}
+                title="Save resource"
               >
-                ♥
+                <Heart className="h-4 w-4" fill={savedResources.includes(resource.id) ? 'currentColor' : 'none'} />
               </button>
             </div>
 
-            <div className="flex items-center justify-between text-xs text-muted-foreground mb-4 pb-4 border-b border-border">
-              <span>{resource.category}</span>
-              <span>
-                {resource.type === 'article' ? resource.readTime : resource.duration}
-              </span>
+            <p className="text-sm text-muted-foreground mb-4 flex-grow">{resource.description}</p>
+
+            <div className="flex items-center justify-between text-xs mb-4 pb-4 border-b border-border">
+              <span className="bg-primary/10 text-primary px-2 py-1 rounded">{resource.category}</span>
+              <span className="text-muted-foreground">{resource.type}</span>
             </div>
 
-            <Button variant="outline" className="w-full">
-              <ExternalLink className="h-4 w-4 mr-2" />
-              View Resource
-            </Button>
+            <a href={resource.url} target="_blank" rel="noopener noreferrer">
+              <Button className="w-full">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Visit
+              </Button>
+            </a>
           </Card>
         ))}
       </div>

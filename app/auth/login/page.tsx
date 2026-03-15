@@ -4,19 +4,42 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { ArrowLeft, Mail, Lock } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 export default function Login() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const supabase = createClient()
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (email && password) {
-      // For demo purposes, just redirect to dashboard
-      router.push('/dashboard')
+    setError(null)
+    setIsLoading(true)
+
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (signInError) {
+        setError(signInError.message)
+        return
+      }
+
+      if (data) {
+        router.push('/dashboard')
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+      console.error(err)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -45,8 +68,9 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground"
+                className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground disabled:opacity-50"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -57,19 +81,27 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground"
+                className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground disabled:opacity-50"
                 required
+                disabled={isLoading}
               />
             </div>
 
-            <Button type="submit" className="w-full">Sign In</Button>
+            {error && (
+              <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30">
+                <p className="text-sm text-destructive">{error}</p>
+              </div>
+            )}
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </Button>
           </form>
 
           <div className="mt-6 space-y-3 text-center text-sm">
-            <Link href="#" className="text-primary hover:underline">Forgot password?</Link>
             <div className="text-muted-foreground">
               Don't have an account?{' '}
-              <Link href="/auth/signup" className="text-primary hover:underline">Sign up</Link>
+              <Link href="/auth/signup" className="text-primary hover:underline font-medium">Sign up</Link>
             </div>
           </div>
         </Card>

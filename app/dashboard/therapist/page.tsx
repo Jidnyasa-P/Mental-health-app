@@ -2,24 +2,26 @@
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Search, MapPin, Star, Calendar } from 'lucide-react'
+import { MapPin, Star, Calendar, Phone, Mail, CheckCircle } from 'lucide-react'
 import { useState } from 'react'
+import { BookingCalendar } from '@/components/booking-calendar'
 
 const therapists = [
-  { id: 1, name: 'Dr. Lisa Wong', specialty: 'Anxiety & Depression', rate: '$120/hr', rating: 4.9, reviews: 48, location: 'New York, NY', available: true },
-  { id: 2, name: 'James Miller', specialty: 'Trauma & PTSD', rate: '$140/hr', rating: 4.8, reviews: 35, location: 'Boston, MA', available: true },
-  { id: 3, name: 'Dr. Sarah Ahmed', specialty: 'Couples Therapy', rate: '$130/hr', rating: 4.7, reviews: 52, location: 'Los Angeles, CA', available: false },
-  { id: 4, name: 'Michael Chen', specialty: 'Stress Management', rate: '$110/hr', rating: 4.9, reviews: 61, location: 'San Francisco, CA', available: true },
-  { id: 5, name: 'Dr. Rebecca Taylor', specialty: 'Life Transitions', rate: '$125/hr', rating: 4.8, reviews: 44, location: 'Seattle, WA', available: true },
-  { id: 6, name: 'David Martinez', specialty: 'Grief Counseling', rate: '$115/hr', rating: 4.7, reviews: 39, location: 'Denver, CO', available: false },
+  { id: 1, name: 'Dr. Sarah Johnson', specialty: 'Depression & Anxiety', rate: '$150/hr', rating: 4.9, reviews: 48, location: 'New York, NY', available: true, bio: 'Licensed therapist with 10+ years experience in cognitive behavioral therapy' },
+  { id: 2, name: 'Dr. Michael Chen', specialty: 'Trauma & PTSD', rate: '$160/hr', rating: 4.8, reviews: 35, location: 'Boston, MA', available: true, bio: 'Specialized in trauma-focused cognitive behavioral therapy and EMDR' },
+  { id: 3, name: 'Dr. Emma Wilson', specialty: 'Relationship Counseling', rate: '$140/hr', rating: 4.7, reviews: 52, location: 'Los Angeles, CA', available: true, bio: 'Expert in couples therapy and family dynamics' },
+  { id: 4, name: 'Dr. James Martinez', specialty: 'Stress Management', rate: '$130/hr', rating: 4.9, reviews: 61, location: 'San Francisco, CA', available: true, bio: 'Specializes in workplace stress and burnout prevention' },
+  { id: 5, name: 'Dr. Lisa Anderson', specialty: 'Grief & Loss', rate: '$145/hr', rating: 4.8, reviews: 44, location: 'Seattle, WA', available: true, bio: 'Compassionate guidance through the grieving process' },
+  { id: 6, name: 'Dr. Robert Davis', specialty: 'Life Coaching', rate: '$135/hr', rating: 4.7, reviews: 39, location: 'Denver, CO', available: true, bio: 'Focuses on personal growth and life transitions' },
 ]
 
 export default function TherapistFinder() {
   const [search, setSearch] = useState('')
   const [specialty, setSpecialty] = useState('All')
-  const [bookings, setBookings] = useState<number[]>([])
+  const [selectedTherapist, setSelectedTherapist] = useState<typeof therapists[0] | null>(null)
+  const [completedBooking, setCompletedBooking] = useState(false)
 
-  const specialties = ['All', 'Anxiety & Depression', 'Trauma & PTSD', 'Couples Therapy', 'Stress Management', 'Life Transitions', 'Grief Counseling']
+  const specialties = ['All', 'Depression & Anxiety', 'Trauma & PTSD', 'Relationship Counseling', 'Stress Management', 'Grief & Loss', 'Life Coaching']
   
   const filteredTherapists = therapists.filter(t => {
     const matchesSearch = t.name.toLowerCase().includes(search.toLowerCase()) || 
@@ -28,8 +30,12 @@ export default function TherapistFinder() {
     return matchesSearch && matchesSpecialty
   })
 
-  const handleBook = (id: number) => {
-    setBookings(prev => prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id])
+  const handleBookingComplete = (date: string, time: string) => {
+    setCompletedBooking(true)
+    setTimeout(() => {
+      setSelectedTherapist(null)
+      setCompletedBooking(false)
+    }, 2000)
   }
 
   return (
@@ -64,41 +70,63 @@ export default function TherapistFinder() {
       </div>
 
       {/* Results */}
-      <div className="grid gap-4">
+      <div className="grid gap-6">
         {filteredTherapists.length > 0 ? (
           filteredTherapists.map((therapist) => (
             <Card key={therapist.id} className="p-6 hover:shadow-lg transition-shadow">
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+                {/* Therapist Info */}
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-foreground">{therapist.name}</h3>
-                  <p className="text-sm text-primary font-medium mt-1">{therapist.specialty}</p>
-                  
-                  <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
-                      {therapist.location}
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground">{therapist.name}</h3>
+                      <p className="text-sm text-primary font-medium mt-1">{therapist.specialty}</p>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 bg-yellow-50 dark:bg-yellow-950 px-3 py-1 rounded-lg">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      {therapist.rating} ({therapist.reviews} reviews)
+                      <span className="text-sm font-semibold text-foreground">{therapist.rating}</span>
                     </div>
                   </div>
                   
-                  <p className="text-lg font-semibold text-foreground mt-3">{therapist.rate}</p>
+                  <p className="text-sm text-muted-foreground mb-4">{therapist.bio}</p>
+                  
+                  <div className="flex flex-col md:flex-row gap-4 text-sm text-muted-foreground mb-4">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 flex-shrink-0" />
+                      {therapist.location}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-semibold text-foreground">{therapist.rate}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs opacity-70">({therapist.reviews} reviews)</span>
+                    </div>
+                  </div>
+
+                  {/* Contact Info */}
+                  <div className="flex gap-3 flex-wrap">
+                    <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50 hover:bg-secondary transition text-sm">
+                      <Phone className="h-4 w-4" />
+                      Call
+                    </button>
+                    <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50 hover:bg-secondary transition text-sm">
+                      <Mail className="h-4 w-4" />
+                      Message
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-2">
+                {/* Booking Button */}
+                <div className="md:text-right">
                   <Button 
-                    onClick={() => handleBook(therapist.id)}
-                    disabled={!therapist.available}
-                    variant={bookings.includes(therapist.id) ? "secondary" : "default"}
+                    size="lg"
+                    onClick={() => setSelectedTherapist(therapist)}
+                    className="w-full md:w-auto"
                   >
                     <Calendar className="h-4 w-4 mr-2" />
-                    {bookings.includes(therapist.id) ? 'Booked' : 'Book Session'}
+                    Book Appointment
                   </Button>
-                  {!therapist.available && (
-                    <p className="text-xs text-muted-foreground text-center">Not available</p>
-                  )}
+                  <p className="text-xs text-muted-foreground mt-2">Next available: Tomorrow</p>
                 </div>
               </div>
             </Card>
@@ -112,15 +140,25 @@ export default function TherapistFinder() {
 
       {/* Help Section */}
       <Card className="mt-8 p-6 bg-primary/5 border-primary/20">
-        <h3 className="font-semibold text-foreground mb-2">Choosing a Therapist</h3>
+        <h3 className="font-semibold text-foreground mb-2">How to Choose a Therapist</h3>
         <p className="text-sm text-muted-foreground mb-4">Consider these factors:</p>
         <ul className="text-sm text-muted-foreground space-y-2">
           <li>✓ Their specialization matches your needs</li>
-          <li>✓ Their availability fits your schedule</li>
-          <li>✓ Patient reviews and ratings</li>
-          <li>✓ Location and meeting format (online/in-person)</li>
+          <li>✓ Patient reviews and ratings from verified clients</li>
+          <li>✓ Their availability and location preferences</li>
+          <li>✓ Meeting format (online/in-person)</li>
+          <li>✓ Your comfort level with the therapist</li>
         </ul>
       </Card>
+
+      {/* Booking Calendar Modal */}
+      {selectedTherapist && (
+        <BookingCalendar
+          therapistName={selectedTherapist.name}
+          onBookingComplete={handleBookingComplete}
+          onCancel={() => setSelectedTherapist(null)}
+        />
+      )}
     </div>
   )
 }
