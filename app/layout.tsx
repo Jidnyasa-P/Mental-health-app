@@ -9,7 +9,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: 'MindWell - Mental Health & Wellness Platform',
   description: 'Your personal mental health companion with AI support, mood tracking, journaling, meditation, and therapy',
-  generator: 'v0.app',
+
   viewport: {
     width: 'device-width',
     initialScale: 1,
