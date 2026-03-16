@@ -18,7 +18,8 @@ import {
   Menu,
   X,
   Settings,
-  Home
+  Home,
+  LogOut
 } from 'lucide-react'
 
 const navigationItems = [
