@@ -22,6 +22,21 @@ export default function Login() {
     setIsLoading(true)
 
     try {
+      // Demo credentials
+      if (email === 'demo@mindwell.com' && password === 'demo123') {
+        // Store demo session in localStorage
+        localStorage.setItem('mindwell_demo_session', JSON.stringify({
+          user: {
+            id: 'demo-user-123',
+            email: 'demo@mindwell.com',
+            user_metadata: { full_name: 'Demo User' }
+          },
+          session_token: 'demo-token-xyz'
+        }))
+        router.push('/dashboard')
+        return
+      }
+
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -58,6 +73,13 @@ export default function Login() {
             </div>
             <h1 className="text-2xl font-bold text-foreground">Welcome Back</h1>
             <p className="text-sm text-muted-foreground mt-2">Sign in to your MindWell account</p>
+          </div>
+
+          {/* Demo Hint */}
+          <div className="mb-6 p-3 rounded-lg bg-primary/5 border border-primary/20">
+            <p className="text-xs text-muted-foreground">
+              <span className="font-semibold text-primary">Demo:</span> demo@mindwell.com / demo123
+            </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">

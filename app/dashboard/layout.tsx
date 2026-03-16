@@ -4,6 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { UserMenu } from '@/components/user-menu'
+import { UserProvider } from '@/lib/user-context'
 import { 
   Heart, 
   Feather, 
@@ -15,9 +17,7 @@ import {
   MessageCircle,
   Menu,
   X,
-  LogOut,
   Settings,
-  User,
   Home
 } from 'lucide-react'
 
@@ -33,7 +33,7 @@ const navigationItems = [
   { name: 'Crisis Support', href: '/dashboard/crisis', icon: MessageCircle },
 ]
 
-export default function DashboardLayout({
+function DashboardContent({
   children,
 }: {
   children: React.ReactNode
@@ -111,16 +111,7 @@ export default function DashboardLayout({
           <div className="flex-1 ml-4 md:ml-0" />
 
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/dashboard/settings">
-                <User className="h-5 w-5" />
-              </Link>
-            </Button>
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/auth/logout">
-                <LogOut className="h-5 w-5" />
-              </Link>
-            </Button>
+            <UserMenu />
           </div>
         </header>
 
@@ -140,5 +131,17 @@ export default function DashboardLayout({
         />
       )}
     </div>
+  )
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <UserProvider>
+      <DashboardContent>{children}</DashboardContent>
+    </UserProvider>
   )
 }

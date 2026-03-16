@@ -12,15 +12,28 @@ interface TimeSlot {
 
 interface BookingCalendarProps {
   therapistName: string
+  therapistId: number
   onBookingComplete: (date: string, time: string) => void
   onCancel: () => void
 }
 
-export function BookingCalendar({ therapistName, onBookingComplete, onCancel }: BookingCalendarProps) {
+export function BookingCalendar({ therapistName, therapistId, onBookingComplete, onCancel }: BookingCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [isBooked, setIsBooked] = useState(false)
+  
+  // Get booked appointments from localStorage
+  const getBookedSlots = () => {
+    const booked = localStorage.getItem('booked_appointments')
+    return booked ? JSON.parse(booked) : {}
+  }
+
+  const isSlotBooked = (date: string, time: string): boolean => {
+    const booked = getBookedSlots()
+    const slotKey = `${therapistId}_${date}_${time}`
+    return booked[slotKey] === true
+  }
 
   const daysInMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
   const firstDayOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth(), 1).getDay()
@@ -29,15 +42,29 @@ export function BookingCalendar({ therapistName, onBookingComplete, onCancel }: 
   const emptyDays = Array.from({ length: firstDayOfMonth(currentDate) }, () => null)
   const calendar = [...emptyDays, ...days]
 
-  const timeSlots: TimeSlot[] = [
-    { time: '09:00 AM', available: true },
-    { time: '10:00 AM', available: false },
-    { time: '11:00 AM', available: true },
-    { time: '02:00 PM', available: true },
-    { time: '03:00 PM', available: false },
-    { time: '04:00 PM', available: true },
-    { time: '05:00 PM', available: true },
-  ]
+  const getTimeSlots = (): TimeSlot[] => {
+    const baseSlots = [
+      { time: '09:00 AM', available: true },
+      { time: '10:00 AM', available: false },
+      { time: '11:00 AM', available: true },
+      { time: '02:00 PM', available: true },
+      { time: '03:00 PM', available: false },
+      { time: '04:00 PM', available: true },
+      { time: '05:00 PM', available: true },
+    ]
+    
+    // If a date is selected, check which times are booked
+    if (selectedDate) {
+      const dateStr = selectedDate.toISOString().split('T')[0]
+      return baseSlots.map(slot => ({
+        ...slot,
+        available: slot.available && !isSlotBooked(dateStr, slot.time)
+      }))
+    }
+    return baseSlots
+  }
+
+  const timeSlots = getTimeSlots()
 
   const handlePrevMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))
@@ -60,6 +87,25 @@ export function BookingCalendar({ therapistName, onBookingComplete, onCancel }: 
   const handleConfirmBooking = () => {
     if (selectedDate && selectedTime) {
       const dateStr = selectedDate.toISOString().split('T')[0]
+      
+      // Save booking to localStorage to prevent double-booking
+      const booked = getBookedSlots()
+      const slotKey = `${therapistId}_${dateStr}_${selectedTime}`
+      booked[slotKey] = true
+      localStorage.setItem('booked_appointments', JSON.stringify(booked))
+      
+      // Save booking to history
+      const history = localStorage.getItem('booking_history')
+      const bookings = history ? JSON.parse(history) : []
+      bookings.push({
+        therapistName,
+        therapistId,
+        date: dateStr,
+        time: selectedTime,
+        bookedAt: new Date().toISOString()
+      })
+      localStorage.setItem('booking_history', JSON.stringify(bookings))
+      
       onBookingComplete(dateStr, selectedTime)
       setIsBooked(true)
       setTimeout(() => {

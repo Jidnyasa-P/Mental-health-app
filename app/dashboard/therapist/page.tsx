@@ -2,9 +2,11 @@
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { MapPin, Star, Calendar, Phone, Mail, CheckCircle } from 'lucide-react'
-import { useState } from 'react'
+import { MapPin, Star, Calendar, Phone, Mail, CheckCircle, MessageSquare } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { BookingCalendar } from '@/components/booking-calendar'
+import { CallInterface } from '@/components/call-interface'
+import { MessageInterface } from '@/components/message-interface'
 
 const therapists = [
   { id: 1, name: 'Dr. Sarah Johnson', specialty: 'Depression & Anxiety', rate: '$150/hr', rating: 4.9, reviews: 48, location: 'New York, NY', available: true, bio: 'Licensed therapist with 10+ years experience in cognitive behavioral therapy' },
@@ -20,6 +22,9 @@ export default function TherapistFinder() {
   const [specialty, setSpecialty] = useState('All')
   const [selectedTherapist, setSelectedTherapist] = useState<typeof therapists[0] | null>(null)
   const [completedBooking, setCompletedBooking] = useState(false)
+  const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null)
+  const [incomingCall, setIncomingCall] = useState<{name: string} | null>(null)
+  const [messagingWith, setMessagingWith] = useState<{name: string} | null>(null)
 
   const specialties = ['All', 'Depression & Anxiety', 'Trauma & PTSD', 'Relationship Counseling', 'Stress Management', 'Grief & Loss', 'Life Coaching']
   
@@ -32,10 +37,23 @@ export default function TherapistFinder() {
 
   const handleBookingComplete = (date: string, time: string) => {
     setCompletedBooking(true)
+    setNotification({
+      message: `Appointment booked with ${selectedTherapist?.name} on ${date} at ${time}`,
+      type: 'success'
+    })
     setTimeout(() => {
       setSelectedTherapist(null)
       setCompletedBooking(false)
-    }, 2000)
+      setNotification(null)
+    }, 3000)
+  }
+
+  const handleCall = (therapist: typeof therapists[0]) => {
+    setIncomingCall({ name: therapist.name })
+  }
+
+  const handleMessage = (therapist: typeof therapists[0]) => {
+    setMessagingWith({ name: therapist.name })
   }
 
   return (
@@ -105,12 +123,18 @@ export default function TherapistFinder() {
 
                   {/* Contact Info */}
                   <div className="flex gap-3 flex-wrap">
-                    <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50 hover:bg-secondary transition text-sm">
+                    <button 
+                      onClick={() => handleCall(therapist)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50 hover:bg-secondary transition text-sm"
+                    >
                       <Phone className="h-4 w-4" />
                       Call
                     </button>
-                    <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50 hover:bg-secondary transition text-sm">
-                      <Mail className="h-4 w-4" />
+                    <button
+                      onClick={() => handleMessage(therapist)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50 hover:bg-secondary transition text-sm"
+                    >
+                      <MessageSquare className="h-4 w-4" />
                       Message
                     </button>
                   </div>
@@ -151,12 +175,40 @@ export default function TherapistFinder() {
         </ul>
       </Card>
 
+      {/* Notification Toast */}
+      {notification && (
+        <div className={`fixed bottom-6 right-6 p-4 rounded-lg shadow-lg z-40 max-w-sm ${
+          notification.type === 'success'
+            ? 'bg-green-500 text-white'
+            : 'bg-red-500 text-white'
+        }`}>
+          <p className="text-sm font-medium">{notification.message}</p>
+        </div>
+      )}
+
       {/* Booking Calendar Modal */}
       {selectedTherapist && (
         <BookingCalendar
           therapistName={selectedTherapist.name}
+          therapistId={selectedTherapist.id}
           onBookingComplete={handleBookingComplete}
           onCancel={() => setSelectedTherapist(null)}
+        />
+      )}
+
+      {/* Incoming Call */}
+      {incomingCall && (
+        <CallInterface
+          contactName={incomingCall.name}
+          onHangup={() => setIncomingCall(null)}
+        />
+      )}
+
+      {/* Message Interface */}
+      {messagingWith && (
+        <MessageInterface
+          contactName={messagingWith.name}
+          onClose={() => setMessagingWith(null)}
         />
       )}
     </div>

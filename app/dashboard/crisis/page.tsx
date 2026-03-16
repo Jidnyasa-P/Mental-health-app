@@ -2,8 +2,9 @@
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Phone, MessageCircle, AlertCircle, Heart } from 'lucide-react'
-import { useState } from 'react'
+import { Phone, MessageCircle, AlertCircle, Heart, Save } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { CallInterface } from '@/components/call-interface'
 
 const crisisResources = [
   { id: 1, name: 'National Suicide Prevention Lifeline', number: '988', description: 'Available 24/7 for emotional distress and suicidal crisis', type: 'Call' },
@@ -23,6 +24,30 @@ const copingStrategies = [
 export default function CrisisSupport() {
   const [contactsOpen, setContactsOpen] = useState(true)
   const [selectedStrategy, setSelectedStrategy] = useState<number | null>(null)
+  const [incomingCall, setIncomingCall] = useState(false)
+  const [safetyPlan, setSafetyPlan] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('safety_plan')
+      return saved ? JSON.parse(saved) : {
+        warnings: '',
+        helpfulThings: '',
+        contacts: ''
+      }
+    }
+    return { warnings: '', helpfulThings: '', contacts: '' }
+  })
+  const [saveSuccess, setSaveSuccess] = useState(false)
+
+  // Auto-save safety plan to localStorage
+  useEffect(() => {
+    localStorage.setItem('safety_plan', JSON.stringify(safetyPlan))
+  }, [safetyPlan])
+
+  const handleSaveSafetyPlan = () => {
+    localStorage.setItem('safety_plan', JSON.stringify(safetyPlan))
+    setSaveSuccess(true)
+    setTimeout(() => setSaveSuccess(false), 3000)
+  }
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
@@ -58,7 +83,10 @@ export default function CrisisSupport() {
                 <p className="text-2xl font-bold text-destructive mb-4">{resource.number}</p>
                 <p className="text-sm text-muted-foreground mb-4">{resource.description}</p>
                 
-                <Button className="w-full bg-destructive hover:bg-destructive/90">
+                <Button 
+                  onClick={() => resource.type === 'Call' && setIncomingCall(true)}
+                  className="w-full bg-destructive hover:bg-destructive/90"
+                >
                   {resource.type === 'Call' ? 'Call Now' : 'Text Now'}
                 </Button>
               </Card>
@@ -99,6 +127,8 @@ export default function CrisisSupport() {
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">Warning signs that a crisis might occur:</label>
             <textarea 
+              value={safetyPlan.warnings}
+              onChange={(e) => setSafetyPlan({...safetyPlan, warnings: e.target.value})}
               placeholder="What are the early signs that you might be in crisis?"
               className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground resize-none h-24"
             />
@@ -107,6 +137,8 @@ export default function CrisisSupport() {
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">Things that help me:</label>
             <textarea 
+              value={safetyPlan.helpfulThings}
+              onChange={(e) => setSafetyPlan({...safetyPlan, helpfulThings: e.target.value})}
               placeholder="Activities, people, places that help you feel safe and calm"
               className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground resize-none h-24"
             />
@@ -115,12 +147,21 @@ export default function CrisisSupport() {
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">People I can contact:</label>
             <textarea 
+              value={safetyPlan.contacts}
+              onChange={(e) => setSafetyPlan({...safetyPlan, contacts: e.target.value})}
               placeholder="Names and phone numbers of people you trust"
               className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground resize-none h-24"
             />
           </div>
           
-          <Button className="w-full">Save My Safety Plan</Button>
+          <Button 
+            onClick={handleSaveSafetyPlan}
+            className="w-full"
+            variant={saveSuccess ? 'default' : 'outline'}
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {saveSuccess ? 'Safety Plan Saved!' : 'Save My Safety Plan'}
+          </Button>
         </div>
       </Card>
 
@@ -137,6 +178,14 @@ export default function CrisisSupport() {
           </div>
         </div>
       </div>
+
+      {/* Incoming Call */}
+      {incomingCall && (
+        <CallInterface
+          contactName="Crisis Support Line"
+          onHangup={() => setIncomingCall(false)}
+        />
+      )}
     </div>
   )
 }

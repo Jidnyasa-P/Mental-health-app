@@ -67,6 +67,14 @@ export function MeditationPlayer({ session, onClose }: MeditationPlayerProps) {
     setIsSpeaking(false)
   }
 
+  // Cleanup audio when component unmounts or dialog closes
+  useEffect(() => {
+    return () => {
+      stopVoice()
+      window.speechSynthesis.cancel()
+    }
+  }, [])
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
