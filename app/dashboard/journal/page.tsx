@@ -136,12 +136,13 @@ export default function PrivateJournal() {
                   <Mic className="h-4 w-4" />
                 </button>
               </div>
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Write your thoughts here... This is a private space for you. You can also use voice input."
-              className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground mb-4 resize-none h-96"
-            />
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Write your thoughts here... This is a private space for you. You can also use voice input."
+                className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground resize-none h-96"
+              />
+            </div>
 
             <div className="flex gap-2">
               <Button onClick={handleSave} className="flex-1">
