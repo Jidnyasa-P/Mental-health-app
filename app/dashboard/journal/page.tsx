@@ -140,7 +140,7 @@ export default function PrivateJournal() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Write your thoughts here... This is a private space for you. You can also use voice input."
-                className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground resize-none h-96"
+                className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground resize-none h-64"
               />
             </div>
 
