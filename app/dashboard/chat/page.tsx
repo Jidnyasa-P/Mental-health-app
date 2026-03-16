@@ -62,24 +62,27 @@ export default function AISupportChat() {
 
       if (response.ok) {
         const data = await response.json()
+        console.log('[v0] Chat response:', data)
         setMessages(prev => [...prev, { 
           id: prev.length + 1, 
           type: 'ai', 
           text: data.response 
         }])
       } else {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('[v0] Chat error response:', response.status, errorData)
         setMessages(prev => [...prev, { 
           id: prev.length + 1, 
           type: 'ai', 
-          text: 'Sorry, I\'m having trouble processing that. Please try again.' 
+          text: `Sorry, I encountered an error (${response.status}). Make sure the API key is configured properly.` 
         }])
       }
     } catch (error) {
-      console.error('Chat error:', error)
+      console.error('[v0] Chat network error:', error)
       setMessages(prev => [...prev, { 
         id: prev.length + 1, 
         type: 'ai', 
-        text: 'I encountered an error. Please make sure the API key is configured.' 
+        text: 'I encountered a network error. Please check your connection and try again.' 
       }])
     } finally {
       setIsLoading(false)

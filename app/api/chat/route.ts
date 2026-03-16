@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY
+const GEMINI_API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
 
 export async function POST(request: NextRequest) {
@@ -15,11 +15,14 @@ export async function POST(request: NextRequest) {
     }
 
     if (!GEMINI_API_KEY) {
+      console.error('[v0] GEMINI_API_KEY or API_KEY environment variable not found')
       return NextResponse.json(
         { error: 'API key not configured' },
         { status: 500 }
       )
     }
+
+    console.log('[v0] Using Gemini API key:', GEMINI_API_KEY.substring(0, 10) + '...')
 
     // Call Gemini API
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
@@ -59,7 +62,9 @@ User message: ${message}`
     }
 
     const data = await response.json()
+    console.log('[v0] Gemini API response:', JSON.stringify(data, null, 2))
     const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'I could not generate a response.'
+    console.log('[v0] Final AI response:', aiResponse)
 
     return NextResponse.json({ response: aiResponse })
   } catch (error) {
