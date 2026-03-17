@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { generateText } from 'ai'
+import { createGroq } from '@ai-sdk/groq'
 
-const GEMINI_API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent'
+const GROQ_API_KEY = process.env.GROQ_API_KEY
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,63 +15,60 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!GEMINI_API_KEY) {
-      console.error('[v0] GEMINI_API_KEY or API_KEY environment variable not found')
+    if (!GROQ_API_KEY) {
+      console.error('[v0] GROQ_API_KEY environment variable not found')
       return NextResponse.json(
         { error: 'API key not configured' },
         { status: 500 }
       )
     }
 
-    console.log('[v0] Using Gemini API key:', GEMINI_API_KEY.substring(0, 10) + '...')
+    console.log('[v0] Using Groq API for chat')
 
-    // Call Gemini API
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: `You are a compassionate and supportive mental health counselor for the MindWell app. 
-Your role is to provide helpful, evidence-based advice on mental health, wellness, and stress management.
-Always remind users that for serious mental health concerns, they should seek professional help.
-Keep responses concise and supportive.
-
-User message: ${message}`
-              }
-            ]
-          }
-        ],
-        generationConfig: {
-          maxOutputTokens: 500,
-          temperature: 0.7,
-        }
-      })
+    const groq = createGroq({
+      apiKey: GROQ_API_KEY,
     })
 
-    if (!response.ok) {
-      const error = await response.json()
-      console.error('Gemini API error:', error)
-      return NextResponse.json(
-        { error: 'Failed to get response from AI' },
-        { status: 500 }
-      )
-    }
+    // System prompt for mental health chatbot
+    const systemPrompt = `You are a compassionate and supportive mental health assistant for MindWell, a mental health and wellness platform. 
 
-    const data = await response.json()
-    console.log('[v0] Gemini API response:', JSON.stringify(data, null, 2))
-    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'I could not generate a response.'
-    console.log('[v0] Final AI response:', aiResponse)
+Your role is to:
+- Provide helpful, evidence-based mental health support and coping strategies
+- Guide users through meditation and mindfulness techniques
+- Help with mood tracking and emotional insights
+- Recommend relevant resources and features
+- Navigate users through MindWell sections:
+  * Meditation: Browse and start guided meditation sessions
+  * Journal: Write private journal entries with voice support
+  * Find Therapist: Book appointments with licensed therapists
+  * Crisis Support: Access emergency resources and create safety plans
+  * Community Forum: Connect with others for support
+  * Mood Tracker: Track emotions and view trends
+  * Resources: Access educational materials
+  * Settings: Manage account and preferences
 
-    return NextResponse.json({ response: aiResponse })
+Always be empathetic, supportive, and professional. For serious mental health emergencies, direct users to crisis support. Keep responses concise and actionable.`
+
+    const { text } = await generateText({
+      model: groq('mixtral-8x7b-32768'),
+      system: systemPrompt,
+      messages: [
+        {
+          role: 'user',
+          content: message,
+        },
+      ],
+      temperature: 0.8,
+      maxTokens: 1024,
+    })
+
+    console.log('[v0] Groq response received:', text.substring(0, 50) + '...')
+
+    return NextResponse.json({ response: text })
   } catch (error) {
-    console.error('Chat API error:', error)
+    console.error('[v0] Chat API error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to get response from AI. Please try again.' },
       { status: 500 }
     )
   }

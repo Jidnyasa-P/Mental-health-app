@@ -2,15 +2,60 @@
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Bell, Lock, Eye, Save } from 'lucide-react'
-import { useState } from 'react'
+import { Bell, Lock, Eye, Save, LogOut } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function Settings() {
   const [saved, setSaved] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [user, setUser] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const session = localStorage.getItem('mindwell_demo_session')
+      return session ? JSON.parse(session).user : null
+    }
+    return null
+  })
+  const [formData, setFormData] = useState({
+    fullName: user?.user_metadata?.full_name || 'Demo User',
+    email: user?.email || 'demo@mindwell.com',
+    phone: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
+  const [notifications, setNotifications] = useState({
+    email: true,
+    meditation: true,
+    community: false
+  })
+  const [privacy, setPrivacy] = useState({
+    profileVisibility: 'private',
+    showActivity: false,
+    allowDiscovery: true
+  })
+  const router = useRouter()
 
   const handleSave = () => {
+    localStorage.setItem('settings', JSON.stringify({
+      formData,
+      notifications,
+      privacy
+    }))
     setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    setTimeout(() => setSaved(false), 3000)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('mindwell_demo_session')
+    router.push('/auth/login')
+  }
+
+  const handleDeleteAccount = () => {
+    if (showDeleteConfirm) {
+      localStorage.clear()
+      router.push('/')
+    }
+    setShowDeleteConfirm(true)
   }
 
   return (
@@ -32,21 +77,36 @@ export default function Settings() {
               <p className="font-medium text-foreground">Email Notifications</p>
               <p className="text-sm text-muted-foreground">Receive updates about your account</p>
             </div>
-            <input type="checkbox" defaultChecked className="h-5 w-5 rounded" />
+            <input 
+              type="checkbox" 
+              checked={notifications.email}
+              onChange={(e) => setNotifications({...notifications, email: e.target.checked})}
+              className="h-5 w-5 rounded" 
+            />
           </div>
           <div className="flex items-center justify-between border-t border-border pt-4">
             <div>
               <p className="font-medium text-foreground">Meditation Reminders</p>
               <p className="text-sm text-muted-foreground">Get daily meditation reminders</p>
             </div>
-            <input type="checkbox" defaultChecked className="h-5 w-5 rounded" />
+            <input 
+              type="checkbox" 
+              checked={notifications.meditation}
+              onChange={(e) => setNotifications({...notifications, meditation: e.target.checked})}
+              className="h-5 w-5 rounded" 
+            />
           </div>
           <div className="flex items-center justify-between border-t border-border pt-4">
             <div>
               <p className="font-medium text-foreground">Community Updates</p>
               <p className="text-sm text-muted-foreground">Hear about new threads and replies</p>
             </div>
-            <input type="checkbox" className="h-5 w-5 rounded" />
+            <input 
+              type="checkbox" 
+              checked={notifications.community}
+              onChange={(e) => setNotifications({...notifications, community: e.target.checked})}
+              className="h-5 w-5 rounded" 
+            />
           </div>
         </div>
       </Card>
@@ -60,10 +120,14 @@ export default function Settings() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">Profile Visibility</label>
-            <select className="w-full p-3 rounded-lg border border-border bg-background text-foreground">
-              <option>Private (only you can see)</option>
-              <option>Friends Only</option>
-              <option>Public</option>
+            <select 
+              value={privacy.profileVisibility}
+              onChange={(e) => setPrivacy({...privacy, profileVisibility: e.target.value})}
+              className="w-full p-3 rounded-lg border border-border bg-background text-foreground"
+            >
+              <option value="private">Private (only you can see)</option>
+              <option value="friends">Friends Only</option>
+              <option value="public">Public</option>
             </select>
           </div>
           <div className="flex items-center justify-between border-t border-border pt-4">
@@ -71,14 +135,24 @@ export default function Settings() {
               <p className="font-medium text-foreground">Show Activity Status</p>
               <p className="text-sm text-muted-foreground">Let others see when you're using MindWell</p>
             </div>
-            <input type="checkbox" className="h-5 w-5 rounded" />
+            <input 
+              type="checkbox" 
+              checked={privacy.showActivity}
+              onChange={(e) => setPrivacy({...privacy, showActivity: e.target.checked})}
+              className="h-5 w-5 rounded" 
+            />
           </div>
           <div className="flex items-center justify-between border-t border-border pt-4">
             <div>
               <p className="font-medium text-foreground">Allow Therapist Discovery</p>
               <p className="text-sm text-muted-foreground">Help therapists find you based on your needs</p>
             </div>
-            <input type="checkbox" defaultChecked className="h-5 w-5 rounded" />
+            <input 
+              type="checkbox" 
+              checked={privacy.allowDiscovery}
+              onChange={(e) => setPrivacy({...privacy, allowDiscovery: e.target.checked})}
+              className="h-5 w-5 rounded" 
+            />
           </div>
         </div>
       </Card>
@@ -116,26 +190,64 @@ export default function Settings() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">Full Name</label>
-            <input type="text" placeholder="Your name" defaultValue="John Doe" className="w-full p-3 rounded-lg border border-border bg-background text-foreground" />
+            <input 
+              type="text" 
+              value={formData.fullName}
+              onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+              className="w-full p-3 rounded-lg border border-border bg-background text-foreground" 
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">Email</label>
-            <input type="email" placeholder="your@email.com" defaultValue="john@example.com" className="w-full p-3 rounded-lg border border-border bg-background text-foreground" />
+            <input 
+              type="email" 
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              className="w-full p-3 rounded-lg border border-border bg-background text-foreground" 
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">Phone</label>
-            <input type="tel" placeholder="+1 (555) 123-4567" className="w-full p-3 rounded-lg border border-border bg-background text-foreground" />
+            <input 
+              type="tel" 
+              value={formData.phone}
+              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              placeholder="+1 (555) 123-4567" 
+              className="w-full p-3 rounded-lg border border-border bg-background text-foreground" 
+            />
+          </div>
+          <div className="border-t border-border pt-4">
+            <h3 className="text-sm font-medium text-foreground mb-3">Change Password</h3>
+            <div className="space-y-3">
+              <input 
+                type="password" 
+                placeholder="New password"
+                value={formData.newPassword}
+                onChange={(e) => setFormData({...formData, newPassword: e.target.value})}
+                className="w-full p-3 rounded-lg border border-border bg-background text-foreground text-sm" 
+              />
+              <input 
+                type="password" 
+                placeholder="Confirm password"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                className="w-full p-3 rounded-lg border border-border bg-background text-foreground text-sm" 
+              />
+            </div>
           </div>
         </div>
       </Card>
 
       {/* Save Button */}
-      <div className="flex gap-3">
+      <div className="flex gap-3 mb-6">
         <Button onClick={handleSave} className="flex-1">
           <Save className="h-4 w-4 mr-2" />
           Save Changes
         </Button>
-        <Button variant="outline" className="flex-1">Cancel</Button>
+        <Button onClick={handleLogout} variant="outline" className="flex-1">
+          <LogOut className="h-4 w-4 mr-2" />
+          Logout
+        </Button>
       </div>
 
       {saved && (
@@ -148,10 +260,39 @@ export default function Settings() {
       <Card className="p-6 mt-8 border-destructive/20 bg-destructive/5">
         <h2 className="text-lg font-semibold text-destructive mb-4">Danger Zone</h2>
         <div className="space-y-3">
-          <Button variant="outline" className="w-full text-destructive hover:bg-destructive/10">
-            Delete Account
-          </Button>
-          <p className="text-xs text-muted-foreground">This action cannot be undone. All your data will be permanently deleted.</p>
+          {!showDeleteConfirm ? (
+            <>
+              <Button 
+                onClick={handleDeleteAccount}
+                variant="outline" 
+                className="w-full text-destructive hover:bg-destructive/10"
+              >
+                Delete Account
+              </Button>
+              <p className="text-xs text-muted-foreground">This action cannot be undone. All your data will be permanently deleted.</p>
+            </>
+          ) : (
+            <>
+              <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20">
+                <p className="text-sm font-medium text-destructive mb-4">Are you sure? This will delete your account and all associated data permanently.</p>
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={handleDeleteAccount}
+                    className="flex-1 bg-destructive hover:bg-destructive/90"
+                  >
+                    Yes, Delete Everything
+                  </Button>
+                  <Button 
+                    onClick={() => setShowDeleteConfirm(false)}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </Card>
     </div>

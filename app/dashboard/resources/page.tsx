@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { BookOpen, ExternalLink, Heart, Volume2 } from 'lucide-react'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 const resources = [
   {
@@ -120,13 +120,29 @@ const categories = ['All', 'Organizations', 'Crisis Support', 'Meditation', 'Onl
 
 export default function EducationalResources() {
   const [selectedCategory, setSelectedCategory] = useState('All')
-  const [savedResources, setSavedResources] = useState<number[]>([])
+  const [showSavedOnly, setShowSavedOnly] = useState(false)
+  const [savedResources, setSavedResources] = useState<number[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('saved_resources')
+      return saved ? JSON.parse(saved) : []
+    }
+    return []
+  })
   const [speakingId, setSpeakingId] = useState<number | null>(null)
   const synthesisRef = useRef<SpeechSynthesisUtterance | null>(null)
 
-  const filteredResources = selectedCategory === 'All' 
+  // Persist saved resources to localStorage
+  useEffect(() => {
+    localStorage.setItem('saved_resources', JSON.stringify(savedResources))
+  }, [savedResources])
+
+  let filteredResources = selectedCategory === 'All' 
     ? resources 
     : resources.filter(r => r.category === selectedCategory)
+
+  if (showSavedOnly) {
+    filteredResources = filteredResources.filter(r => savedResources.includes(r.id))
+  }
 
   const handleSave = (id: number) => {
     setSavedResources(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id])
@@ -159,8 +175,8 @@ export default function EducationalResources() {
         <p className="text-muted-foreground">Learn about mental health, wellness, and personal growth</p>
       </div>
 
-      {/* Categories */}
-      <div className="flex gap-3 mb-8 overflow-x-auto pb-2">
+      {/* Categories & Filters */}
+      <div className="flex gap-3 mb-8 overflow-x-auto pb-2 items-center">
         {categories.map(cat => (
           <button
             key={cat}
@@ -174,6 +190,17 @@ export default function EducationalResources() {
             {cat}
           </button>
         ))}
+        <button
+          onClick={() => setShowSavedOnly(!showSavedOnly)}
+          className={`px-4 py-2 rounded-full whitespace-nowrap transition flex items-center gap-2 ${
+            showSavedOnly
+              ? 'bg-red-500/20 text-red-600 border border-red-500/50'
+              : 'bg-muted text-foreground hover:bg-muted/80'
+          }`}
+        >
+          <Heart className="h-4 w-4" />
+          Saved ({savedResources.length})
+        </button>
       </div>
 
       {/* Stats */}
