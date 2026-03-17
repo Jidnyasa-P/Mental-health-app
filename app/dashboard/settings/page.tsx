@@ -36,6 +36,21 @@ export default function Settings() {
   const router = useRouter()
 
   const handleSave = () => {
+    // Update user session with new info
+    if (user) {
+      const updated = {
+        user: {
+          ...user,
+          email: formData.email,
+          user_metadata: {
+            full_name: formData.fullName,
+            phone: formData.phone
+          }
+        },
+        session_token: 'demo-token-xyz'
+      }
+      localStorage.setItem('mindwell_demo_session', JSON.stringify(updated))
+    }
     localStorage.setItem('settings', JSON.stringify({
       formData,
       notifications,
@@ -43,6 +58,17 @@ export default function Settings() {
     }))
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
+  }
+
+  const handlePasswordChange = () => {
+    if (formData.newPassword === formData.confirmPassword && formData.newPassword.length >= 6) {
+      alert('Password changed successfully!')
+      setFormData({...formData, newPassword: '', confirmPassword: ''})
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } else {
+      alert('Passwords must match and be at least 6 characters')
+    }
   }
 
   const handleLogout = () => {
@@ -54,8 +80,9 @@ export default function Settings() {
     if (showDeleteConfirm) {
       localStorage.clear()
       router.push('/')
+    } else {
+      setShowDeleteConfirm(true)
     }
-    setShowDeleteConfirm(true)
   }
 
   return (
@@ -164,9 +191,23 @@ export default function Settings() {
           Security
         </h2>
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">Password</label>
-            <Button variant="outline" className="w-full">Change Password</Button>
+          <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+            <label className="block text-sm font-medium text-foreground mb-4">Change Password</label>
+            <input
+              type="password"
+              value={formData.newPassword}
+              onChange={(e) => setFormData({...formData, newPassword: e.target.value})}
+              placeholder="New Password (min 6 characters)"
+              className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground mb-3"
+            />
+            <input
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+              placeholder="Confirm Password"
+              className="w-full p-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground mb-3"
+            />
+            <Button onClick={handlePasswordChange} className="w-full">Update Password</Button>
           </div>
           <div className="border-t border-border pt-4">
             <label className="block text-sm font-medium text-foreground mb-2">Two-Factor Authentication</label>

@@ -145,7 +145,13 @@ export default function EducationalResources() {
   }
 
   const handleSave = (id: number) => {
-    setSavedResources(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id])
+    setSavedResources(prev => {
+      const updated = prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('saved_resources', JSON.stringify(updated))
+      }
+      return updated
+    })
   }
 
   const speakDescription = (id: number, title: string, description: string) => {
@@ -177,6 +183,16 @@ export default function EducationalResources() {
 
       {/* Categories & Filters */}
       <div className="flex gap-3 mb-8 overflow-x-auto pb-2 items-center">
+        <button
+          onClick={() => setShowSavedOnly(!showSavedOnly)}
+          className={`px-4 py-2 rounded-full whitespace-nowrap transition font-medium ${
+            showSavedOnly
+              ? 'bg-accent text-accent-foreground'
+              : 'bg-muted text-foreground hover:bg-muted/80'
+          }`}
+        >
+          {showSavedOnly ? '❤️ Saved Only' : '📌 View All'}
+        </button>
         {categories.map(cat => (
           <button
             key={cat}
