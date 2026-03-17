@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Heart, Brain, Zap, Users, BookOpen, MessageCircle, Feather, ArrowRight, CheckCircle } from 'lucide-react'
+import { Heart, Brain, Zap, Users, BookOpen, MessageCircle, Feather, ArrowRight, CheckCircle, Sparkles } from 'lucide-react'
 import { Footer } from '@/components/footer'
 
 const features = [
@@ -56,6 +57,61 @@ const features = [
     href: '/dashboard/crisis',
   },
 ]
+
+function FlipCard({ feature, index }) {
+  const [isFlipped, setIsFlipped] = useState(false)
+  const Icon = feature.icon
+
+  return (
+    <div
+      className="h-64 cursor-pointer perspective animate-fade-in"
+      style={{ animationDelay: `${index * 0.1}s` }}
+      onClick={() => setIsFlipped(!isFlipped)}
+    >
+      <div
+        className="relative w-full h-full transition-transform duration-500 transform-gpu"
+        style={{
+          transformStyle: 'preserve-3d',
+          transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+        }}
+      >
+        {/* Front of card */}
+        <div
+          className="absolute w-full h-full p-6 bg-gradient-to-br from-primary/5 to-accent/5 rounded-lg border border-primary/20 hover:border-primary/50 hover:shadow-lg flex flex-col items-center justify-center text-center transition-all"
+          style={{ backfaceVisibility: 'hidden' }}
+        >
+          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+            <Icon className="h-6 w-6 text-primary" />
+          </div>
+          <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
+          <p className="text-xs text-muted-foreground mb-4">Click to learn more</p>
+          <Sparkles className="h-4 w-4 text-primary/60 animate-pulse" />
+        </div>
+
+        {/* Back of card */}
+        <div
+          className="absolute w-full h-full p-6 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg border border-primary/30 hover:border-primary/60 hover:shadow-lg flex flex-col items-center justify-center text-center transition-all"
+          style={{
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+          }}
+        >
+          <div className="flex flex-col h-full justify-between items-center">
+            <div>
+              <p className="text-sm text-foreground font-medium mb-2">{feature.description}</p>
+            </div>
+            <Link
+              href={feature.href}
+              className="px-4 py-2 rounded-lg bg-primary/20 text-primary hover:bg-primary hover:text-primary-foreground transition-all text-sm font-medium"
+            >
+              Start Now <ArrowRight className="h-3 w-3 inline ml-1" />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function Home() {
   return (
@@ -138,25 +194,9 @@ export default function Home() {
         </div>
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {features.map((feature, index) => {
-            const Icon = feature.icon
-            return (
-              <Card
-                key={feature.href}
-                className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-2 group cursor-pointer border-primary/10 hover:border-primary/50 animate-fade-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-                  <Icon className="h-6 w-6 text-primary group-hover:text-primary-foreground" />
-                </div>
-                <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground mb-4">{feature.description}</p>
-                <Link href={feature.href} className="text-primary text-sm font-medium hover:gap-2 flex items-center gap-1 transition-all">
-                  Explore <ArrowRight className="h-3 w-3" />
-                </Link>
-              </Card>
-            )
-          })}
+          {features.map((feature, index) => (
+            <FlipCard key={feature.href} feature={feature} index={index} />
+          ))}
         </div>
       </section>
 
@@ -206,6 +246,12 @@ export default function Home() {
         .animate-slide-up {
           animation: slide-up 0.6s ease-out forwards;
           opacity: 0;
+        }
+        .perspective {
+          perspective: 1000px;
+        }
+        .transform-gpu {
+          will-change: transform;
         }
       `}</style>
     </div>
