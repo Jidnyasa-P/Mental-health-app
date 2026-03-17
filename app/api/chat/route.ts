@@ -50,7 +50,7 @@ Your role is to:
 Always be empathetic, supportive, and professional. For serious mental health emergencies, direct users to crisis support. Keep responses concise and actionable.`
 
     const { text } = await generateText({
-      model: groq('llama-3.1-70b-versatile'),
+      model: groq('llama-3.3-70b-versatile'),
       system: systemPrompt,
       messages: [
         {
