@@ -85,23 +85,23 @@ export default function Home() {
       <section className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-float"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-        
+
         <div className="relative text-center">
           <div className="inline-block mb-4 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
             <p className="text-sm font-medium text-primary">Welcome to MindWell</p>
           </div>
-          
+
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground text-balance mb-6 animate-fade-in">
             Your Mental Health Companion
           </h1>
-          
+
           <p className="mt-6 text-xl text-muted-foreground max-w-3xl mx-auto text-pretty animate-fade-in" style={{ animationDelay: '0.2s' }}>
             Track your mood, journal with voice support, get AI guidance, find therapists, and connect with a supportive community. All in one peaceful place.
           </p>
-          
+
           <div className="mt-12 flex items-center justify-center gap-4 flex-wrap animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <Button size="lg" asChild className="hover:scale-105 transition-transform">
-              <Link href="/auth/login">Demo Login (demo@mindwell.com)</Link>
+              <Link href="/auth/login">Get Started</Link>
             </Button>
             <Button size="lg" variant="outline" asChild className="hover:scale-105 transition-transform">
               <Link href="#features">
@@ -141,8 +141,8 @@ export default function Home() {
           {features.map((feature, index) => {
             const Icon = feature.icon
             return (
-              <Card 
-                key={feature.href} 
+              <Card
+                key={feature.href}
                 className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-2 group cursor-pointer border-primary/10 hover:border-primary/50 animate-fade-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
