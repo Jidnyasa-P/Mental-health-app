@@ -12,9 +12,11 @@ export function Footer() {
           {/* Brand Section */}
           <div className="col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
-                MW
-              </div>
+              <img
+                src="/mindwell-logo.png"
+                alt="MindWell Logo"
+                className="h-10 w-10 rounded-lg object-contain bg-white"
+              />
               <h3 className="text-lg font-bold text-foreground">MindWell</h3>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
