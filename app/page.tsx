@@ -121,9 +121,11 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold animate-pulse">
-                MW
-              </div>
+              <img
+                src="/mindwell-logo.png"
+                alt="MindWell Logo"
+                className="h-10 w-10 rounded-lg object-contain bg-white"
+              />
               <span className="text-lg font-semibold text-foreground">MindWell</span>
             </div>
             <nav className="hidden items-center gap-8 md:flex">
