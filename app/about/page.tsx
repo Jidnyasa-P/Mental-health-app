@@ -72,15 +72,23 @@ export default function About() {
         <h2 className="text-3xl font-bold text-foreground mb-12 text-center">Our Team</h2>
         <div className="grid gap-6 md:grid-cols-2">
           {[
-            { name: 'Dr. Sarah Chen', role: 'Co-Founder & Clinical Director' },
-            { name: 'Michael Rodriguez', role: 'Co-Founder & Chief Technology Officer' },
-            { name: 'Emma Johnson', role: 'Head of Product' },
-            { name: 'David Lee', role: 'Head of Community' },
+            { name: 'Jidnyasa Patil', role: 'Founder & Developer' },
+            { name: 'Asmi Tatawar', role: 'Co-Founder & Developer' },
           ].map((member, index) => (
             <Card key={index} className="p-6">
-              <div className="h-12 w-12 rounded-full bg-primary/20 mb-4" />
+              <img
+                src="/Jidnyasa.png"
+                alt="Jidnyasa"
+                className="h-10 w-10 rounded-lg object-contain bg-white"
+              />
               <h3 className="font-semibold text-foreground">{member.name}</h3>
-              <p className="text-sm text-muted-foreground mt-1">{member.role}</p>
+              <p className="text-sm text-muted-foreground mt-1">{member.role, <img 
+      src="/Asmi.png" 
+      alt="Asmi" 
+      className="h-10 w-10 rounded-lg object-contain bg-white" 
+    />
+              <h3 className="font-semibold text-foreground">{member.name}</h3>
+              <p className="text-sm text-muted-foreground mt-1">{member.role,}</p>
             </Card>
           ))}
         </div>
