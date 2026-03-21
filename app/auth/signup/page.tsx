@@ -70,7 +70,7 @@ export default function Signup() {
         <Card className="p-8">
           <div className="text-center mb-8">
             <img
-              src="/mindwell-logo.png"
+              src="public/mindwell-logo.png"
               alt="MindWell Logo"
               className="h-10 w-10 rounded-lg object-contain bg-white"
             />
