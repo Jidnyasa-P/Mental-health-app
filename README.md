@@ -1,6 +1,12 @@
-# MindWell - Your Mental Health Companion
+# 🧠MindWell - Your Mental Health Companion
 
-A comprehensive, AI-powered mental health and wellness platform built with Next.js 16, React 19, and modern web technologies.
+MindWell is an AI-powered mental health platform designed to bridge the gap between self-care and professional support. By integrating an intelligent emotional support chatbot with data-driven mood tracking and journaling, we provide users with a safe, accessible space for mental wellness. Our solution leverages personalized AI insights, self-assessment analytics, and gamified habit tracking to encourage healthy mental habits and support early detection of emotional distress. From meditative tools to community access, MindWell is built to be a scalable ecosystem for a healthier, more mindful world.
+
+## 👥 Meet the Team
+
+Jidnyasa Patil - Founder & Developer
+
+Asmi Tatawar - Co-Founder & Developer
 
 ## Features
 
@@ -21,8 +27,13 @@ A comprehensive, AI-powered mental health and wellness platform built with Next.
 - **Responsive Design**: Fully responsive across all device sizes
 - **Voice Support**: Speech-to-text input and text-to-speech output throughout the app
 - **Data Persistence**: All user data saved securely in localStorage
-- **Dark Mode**: System theme detection with light/dark mode support
+- **Dark Mode**: System theme detection with light/dark mode support (Beta)
 - **Accessibility**: WCAG AA compliant with keyboard navigation and screen reader support
+
+### Authentication & Security
+- **Secure Email/Password Login**: Integrated form validation to ensure email accuracy and password complexity.
+- **Google OAuth 2.0 (Beta)**: Streamlined "One-Tap" onboarding using existing Google accounts.
+- **Protected User Data**: All personal wellness data, journals, and mood history are strictly tied to unique user IDs and accessible only after successful authentication.
 
 ## Quick Start
 
