@@ -50,7 +50,7 @@ function DashboardContent({
         <div className="p-6">
           <div className="flex items-center gap-2 mb-8">
             <img
-              src="public/mindwell-logo.png"
+              src="/mindwell-logo.png"
               alt="MindWell Logo"
               className="h-10 w-10 rounded-lg object-contain bg-white"
             />

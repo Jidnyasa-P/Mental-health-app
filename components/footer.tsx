@@ -13,7 +13,7 @@ export function Footer() {
           <div className="col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <img
-                src="public/mindwell-logo.png"
+                src="/mindwell-logo.png"
                 alt="MindWell Logo"
                 className="h-10 w-10 rounded-lg object-contain bg-white"
               />
