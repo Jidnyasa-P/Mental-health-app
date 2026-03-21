@@ -72,13 +72,23 @@ export default function About() {
         <h2 className="text-3xl font-bold text-foreground mb-12 text-center">Our Team</h2>
         <div className="grid gap-6 md:grid-cols-2">
           {[
-            { name: 'Dr. Sarah Chen', role: 'Co-Founder & Clinical Director' },
-            { name: 'Michael Rodriguez', role: 'Co-Founder & Chief Technology Officer' },
-            { name: 'Emma Johnson', role: 'Head of Product' },
-            { name: 'David Lee', role: 'Head of Community' },
+            {
+              name: 'Jidnyasa Patil',
+              role: 'Founder & Developer',
+              image: '/Jidnyasa.png' // Added image path
+            },
+            {
+              name: 'Asmi Tatawar',
+              role: 'Co-Founder & Developer',
+              image: '/Asmi.png'     // Added image path
+            },
           ].map((member, index) => (
             <Card key={index} className="p-6">
-              <div className="h-12 w-12 rounded-full bg-primary/20 mb-4" />
+              <img
+                src={member.image}     // Changed from hardcoded string
+                alt={member.name}      // Changed to use the dynamic name
+                className="h-24 w-24 rounded-full object-cover bg-white mb-4"
+              />
               <h3 className="font-semibold text-foreground">{member.name}</h3>
               <p className="text-sm text-muted-foreground mt-1">{member.role}</p>
             </Card>
