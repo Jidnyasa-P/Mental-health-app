@@ -6,14 +6,14 @@ import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { UserMenu } from '@/components/user-menu'
 import { UserProvider } from '@/lib/user-context'
-import { 
-  Heart, 
-  Feather, 
-  Brain, 
-  Zap, 
-  Users, 
-  Search, 
-  BookOpen, 
+import {
+  Heart,
+  Feather,
+  Brain,
+  Zap,
+  Users,
+  Search,
+  BookOpen,
   MessageCircle,
   Menu,
   X,
@@ -45,14 +45,15 @@ function DashboardContent({
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
-      <aside className={`${
-        sidebarOpen ? 'block' : 'hidden'
-      } md:block w-full md:w-64 border-r border-border bg-sidebar overflow-y-auto`}>
+      <aside className={`${sidebarOpen ? 'block' : 'hidden'
+        } md:block w-full md:w-64 border-r border-border bg-sidebar overflow-y-auto`}>
         <div className="p-6">
           <div className="flex items-center gap-2 mb-8">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground font-bold">
-              MW
-            </div>
+            <img
+              src="/mindwell-logo.png"
+              alt="MindWell Logo"
+              className="h-10 w-10 rounded-lg object-contain bg-white"
+            />
             <span className="text-lg font-semibold text-sidebar-foreground">MindWell</span>
           </div>
 
@@ -65,11 +66,10 @@ function DashboardContent({
                   key={item.href}
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                    isActive
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
                       ? 'bg-sidebar-primary text-sidebar-primary-foreground'
                       : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-                  }`}
+                    }`}
                 >
                   <Icon className="h-5 w-5" />
                   <span className="text-sm font-medium">{item.name}</span>

@@ -68,9 +68,11 @@ export default function Login() {
 
         <Card className="p-8">
           <div className="text-center mb-8">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold mx-auto mb-4">
-              MW
-            </div>
+            <img
+              src="/mindwell-logo.png"
+              alt="MindWell Logo"
+              className="h-10 w-10 rounded-lg object-contain bg-white"
+            />
             <h1 className="text-2xl font-bold text-foreground">Welcome Back</h1>
             <p className="text-sm text-muted-foreground mt-2">Sign in to your MindWell account</p>
           </div>
