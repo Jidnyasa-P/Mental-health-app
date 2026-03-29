@@ -1,6 +1,7 @@
 # 🧠MindWell - Your Mental Health Companion
 
 MindWell is an AI-powered mental health platform designed to bridge the gap between self-care and professional support. By integrating an intelligent emotional support chatbot with data-driven mood tracking and journaling, we provide users with a safe, accessible space for mental wellness. Our solution leverages personalized AI insights, self-assessment analytics, and gamified habit tracking to encourage healthy mental habits and support early detection of emotional distress. From meditative tools to community access, MindWell is built to be a scalable ecosystem for a healthier, more mindful world.
+https://v0-mental-health-app-chi-cyan.vercel.app/
 
 ## 👥 Meet the Team
 
